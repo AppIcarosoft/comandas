@@ -31,8 +31,12 @@ export function saveAuthContext(auth) {
 
 export async function authenticateFromBackend() {
   const httpUri = import.meta.env.VITE_GRAPHQL_HTTP_URL || DEFAULT_HTTP_URL;
-  const v3Login = "jessicalidad";
-  const v3Pswd = "c123456";
+  const v3Login = import.meta.env.VITE_V3_LOGIN || "";
+  const v3Pswd = import.meta.env.VITE_V3_PSWD || "";
+
+  if (!v3Login || !v3Pswd) {
+    throw new Error("Faltan VITE_V3_LOGIN o VITE_V3_PSWD en variables de entorno.");
+  }
 
   const response = await fetch(httpUri, {
     method: "POST",
