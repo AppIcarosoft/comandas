@@ -37,15 +37,7 @@ export const COMANDAS_TABLERO_REALTIME_SUBSCRIPTION = gql`
         sucursal
         createdAt: created_at
         updatedAt: updated_at
-        detalles {
-          id
-          productoId: producto_id
-          productoNombre: producto_nombre
-          cantidad
-          precio
-          total
-          observacion
-        }
+        detalle_comanda
       }
     }
   }

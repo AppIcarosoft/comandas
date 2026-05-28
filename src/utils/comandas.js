@@ -88,6 +88,20 @@ export function formatDateTime(value) {
 
 export function normalizeComanda(comanda) {
   if (!comanda) return comanda;
+  const detalleRaw = comanda.detalle_comanda ?? comanda.detalleComanda ?? comanda.detalles ?? [];
+  let detalleList = [];
+
+  if (Array.isArray(detalleRaw)) {
+    detalleList = detalleRaw;
+  } else if (typeof detalleRaw === "string") {
+    try {
+      const parsed = JSON.parse(detalleRaw);
+      detalleList = Array.isArray(parsed) ? parsed : [];
+    } catch {
+      detalleList = [];
+    }
+  }
+
   return {
     ...comanda,
     clienteNombre: comanda.clienteNombre ?? comanda.cliente_nombre ?? "",
@@ -102,10 +116,15 @@ export function normalizeComanda(comanda) {
     referenciaPago: comanda.referenciaPago ?? comanda.referencia_pago ?? "",
     createdAt: comanda.createdAt ?? comanda.created_at,
     updatedAt: comanda.updatedAt ?? comanda.updated_at,
-    detalles: (comanda.detalles || []).map((d) => ({
+    detalleComanda: detalleList,
+    detalles: detalleList.map((d, index) => ({
       ...d,
+      id: d.id ?? `${comanda.id || "comanda"}-${index}`,
       productoId: d.productoId ?? d.producto_id ?? null,
       productoNombre: d.productoNombre ?? d.producto_nombre ?? "",
+      cantidad: Number(d.cantidad ?? 0),
+      precio: Number(d.precio ?? 0),
+      total: Number(d.total ?? (Number(d.cantidad ?? 0) * Number(d.precio ?? 0))),
     })),
   };
 }

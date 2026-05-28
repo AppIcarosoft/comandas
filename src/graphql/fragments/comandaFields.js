@@ -22,14 +22,6 @@ export const COMANDA_FIELDS = gql`
     observacion
     createdAt
     updatedAt
-    detalles {
-      id
-      productoId
-      productoNombre
-      cantidad
-      precio
-      total
-      observacion
-    }
+    detalle_comanda
   }
 `;
