@@ -16,8 +16,12 @@ export default function DeliveryView({
         <div>
           <h3 className="mb-2 text-sm font-semibold uppercase text-slate-500">Pickup listo para retirar</h3>
           <div className="space-y-2">
-            {pickupOrders.map((comanda) => (
-              <article key={comanda.id} className="rounded-lg border border-slate-200 bg-white p-3">
+            {pickupOrders.map((comanda, index) => (
+              <article
+                key={comanda.id}
+                style={{ animationDelay: `${Math.min(index, 8) * 30}ms` }}
+                className="ui-card-3d ui-fade-in rounded-lg p-3"
+              >
                 <div className="font-semibold">{comanda.codigo}</div>
                 <div className="text-sm">{comanda.clienteNombre}</div>
                 <div className="text-sm text-slate-600">{comanda.clienteTelefono}</div>
@@ -26,7 +30,7 @@ export default function DeliveryView({
                   type="button"
                   disabled={loading}
                   onClick={() => onMarkEntregada(comanda)}
-                  className="mt-2 rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white disabled:bg-slate-300"
+                  className="ui-btn mt-2 rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white disabled:bg-slate-300"
                 >
                   Marcar entregada
                 </button>
@@ -39,8 +43,12 @@ export default function DeliveryView({
         <div>
           <h3 className="mb-2 text-sm font-semibold uppercase text-slate-500">Delivery listo para enviar</h3>
           <div className="space-y-2">
-            {deliveryOrders.map((comanda) => (
-              <article key={comanda.id} className="rounded-lg border border-slate-200 bg-white p-3">
+            {deliveryOrders.map((comanda, index) => (
+              <article
+                key={comanda.id}
+                style={{ animationDelay: `${Math.min(index, 8) * 30}ms` }}
+                className="ui-card-3d ui-fade-in rounded-lg p-3"
+              >
                 <div className="font-semibold">{comanda.codigo}</div>
                 <div className="text-sm">{comanda.direccionEntrega || "-"}</div>
                 <div className="text-sm text-slate-600">{comanda.referenciaDireccion || "-"}</div>
@@ -51,7 +59,7 @@ export default function DeliveryView({
                     type="button"
                     disabled={loading}
                     onClick={() => onMarkEnCamino(comanda)}
-                    className="rounded-md bg-purple-600 px-3 py-2 text-sm font-medium text-white disabled:bg-slate-300"
+                    className="ui-btn rounded-md bg-purple-600 px-3 py-2 text-sm font-medium text-white disabled:bg-slate-300"
                   >
                     Marcar en camino
                   </button>
@@ -59,7 +67,7 @@ export default function DeliveryView({
                     type="button"
                     disabled={loading}
                     onClick={() => onMarkEntregada(comanda)}
-                    className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white disabled:bg-slate-300"
+                    className="ui-btn rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white disabled:bg-slate-300"
                   >
                     Marcar entregada
                   </button>
@@ -70,7 +78,7 @@ export default function DeliveryView({
                       const repartidor = window.prompt("Nombre del repartidor");
                       if (repartidor && repartidor.trim()) onAsignarRepartidor(comanda, repartidor.trim());
                     }}
-                    className="rounded-md border border-slate-300 px-3 py-2 text-sm"
+                    className="ui-btn rounded-md border border-slate-300 px-3 py-2 text-sm"
                   >
                     Asignar repartidor
                   </button>

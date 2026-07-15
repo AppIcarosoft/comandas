@@ -9,15 +9,18 @@ function InfoItem({ label, value }) {
   );
 }
 
-export default function ComandaCard({ comanda, onOpenDetail }) {
+export default function ComandaCard({ comanda, onOpenDetail, index = 0 }) {
   return (
     <article
-      className={`relative rounded-lg border bg-white p-4 shadow-sm transition hover:shadow-md ${
-        comanda.isNew ? "ring-2 ring-emerald-400" : "border-slate-200"
+      style={{ animationDelay: `${Math.min(index, 12) * 40}ms` }}
+      className={`ui-card-3d ui-fade-in relative rounded-lg p-4 ${
+        comanda.isNew ? "ui-pop-in ui-new-ring ring-2 ring-emerald-400/70" : ""
+      } ${
+        comanda.isMoving ? "ui-shift" : ""
       }`}
     >
       {comanda.isNew && (
-        <span className="absolute right-3 top-3 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-semibold uppercase text-white">
+        <span className="absolute right-3 top-3 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-semibold uppercase text-white shadow">
           Nueva
         </span>
       )}
@@ -43,7 +46,7 @@ export default function ComandaCard({ comanda, onOpenDetail }) {
       <button
         type="button"
         onClick={() => onOpenDetail(comanda)}
-        className="mt-3 w-full rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700"
+        className="ui-btn mt-3 w-full rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700"
       >
         Ver detalle
       </button>

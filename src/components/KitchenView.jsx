@@ -5,8 +5,12 @@ export default function KitchenView({ comandas, onStartPreparing, onMarkReady, l
     <section className="space-y-3">
       <h2 className="text-lg font-semibold text-slate-900">Vista Cocina</h2>
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {comandas.map((comanda) => (
-          <article key={comanda.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        {comandas.map((comanda, index) => (
+          <article
+            key={comanda.id}
+            style={{ animationDelay: `${Math.min(index, 10) * 35}ms` }}
+            className="ui-card-3d ui-fade-in rounded-xl p-4"
+          >
             <div className="mb-2 flex items-center justify-between">
               <h3 className="text-base font-bold">{comanda.codigo}</h3>
               <span className="text-xs font-semibold uppercase text-slate-500">{comanda.tipoEntrega}</span>
@@ -27,7 +31,7 @@ export default function KitchenView({ comandas, onStartPreparing, onMarkReady, l
                 type="button"
                 onClick={() => onStartPreparing(comanda)}
                 disabled={loading || comanda.estado !== "pagada"}
-                className="flex-1 rounded-md bg-orange-600 px-3 py-2 text-sm font-medium text-white disabled:bg-slate-300"
+                className="ui-btn flex-1 rounded-md bg-orange-600 px-3 py-2 text-sm font-medium text-white disabled:bg-slate-300"
               >
                 Iniciar preparación
               </button>
@@ -35,7 +39,7 @@ export default function KitchenView({ comandas, onStartPreparing, onMarkReady, l
                 type="button"
                 onClick={() => onMarkReady(comanda)}
                 disabled={loading || (comanda.estado !== "preparando" && comanda.estado !== "pagada")}
-                className="flex-1 rounded-md bg-green-600 px-3 py-2 text-sm font-medium text-white disabled:bg-slate-300"
+                className="ui-btn flex-1 rounded-md bg-green-600 px-3 py-2 text-sm font-medium text-white disabled:bg-slate-300"
               >
                 Marcar lista
               </button>

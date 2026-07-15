@@ -70,6 +70,8 @@ const DEFAULT_FILTERS = {
   search: "",
 };
 
+const MOVING_ANIMATION_MS = 450;
+
 export default function AdminComandas() {
   const useMock = import.meta.env.VITE_USE_MOCK === "true";
   const [view, setView] = useState("dashboard");
@@ -82,6 +84,28 @@ export default function AdminComandas() {
   const [authContext, setAuthContext] = useState(getStoredAuth());
   const [authLoading, setAuthLoading] = useState(!useMock);
   const [authError, setAuthError] = useState("");
+
+  function markMovingBetweenColumns(nextRows, previousRows) {
+    const previousById = new Map(previousRows.map((row) => [row.id, row]));
+    const movingIds = [];
+    const enriched = nextRows.map((row) => {
+      const prev = previousById.get(row.id);
+      const isMoving = Boolean(prev && prev.estado !== row.estado);
+      if (isMoving) movingIds.push(row.id);
+      return { ...row, isMoving };
+    });
+
+    if (movingIds.length) {
+      const movingSet = new Set(movingIds);
+      setTimeout(() => {
+        setComandas((current) =>
+          current.map((row) => (movingSet.has(row.id) ? { ...row, isMoving: false } : row))
+        );
+      }, MOVING_ANIMATION_MS);
+    }
+
+    return enriched;
+  }
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
@@ -163,7 +187,7 @@ export default function AdminComandas() {
           }
           return { ...normalized, isNew };
         });
-        return merged;
+        return markMovingBetweenColumns(merged, prev);
       });
     },
   });
@@ -177,7 +201,7 @@ export default function AdminComandas() {
     if (list) {
       setComandas((prev) => {
         const previousIds = new Set(prev.map((item) => item.id));
-        return list.map((item) => {
+        const nextRows = list.map((item) => {
           const normalized = normalizeComanda(item);
           const isNew = !previousIds.has(normalized.id);
           if (isNew && prev.length > 0) {
@@ -191,6 +215,7 @@ export default function AdminComandas() {
           }
           return { ...normalized, isNew };
         });
+        return markMovingBetweenColumns(nextRows, prev);
       });
     }
   }, [tableroData, useMock, soundEnabled]);
@@ -242,7 +267,10 @@ export default function AdminComandas() {
       setToast({ type: "warning", message: "Pago no aprobado. Confirma antes de preparar." });
     }
     if (useMock) {
-      setComandas((prev) => prev.map((c) => (c.id === comanda.id ? { ...c, estado } : c)));
+      setComandas((prev) => {
+        const nextRows = prev.map((c) => (c.id === comanda.id ? { ...c, estado } : c));
+        return markMovingBetweenColumns(nextRows, prev);
+      });
       return;
     }
     const res = await mutateEstado({
@@ -367,8 +395,8 @@ export default function AdminComandas() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 p-4 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <main className="min-h-screen p-4 text-slate-900 dark:text-slate-100">
+      <header className="ui-panel mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl p-4">
         <div>
           <h1 className="text-2xl font-bold">Administración de Comandas</h1>
           <p className="text-sm text-slate-500 dark:text-slate-300">
@@ -379,42 +407,42 @@ export default function AdminComandas() {
           <button
             type="button"
             onClick={() => setView("dashboard")}
-            className={`rounded-md px-3 py-2 text-sm ${view === "dashboard" ? "bg-slate-900 text-white" : "border border-slate-300 bg-white dark:bg-slate-900"}`}
+            className={`ui-btn rounded-md px-3 py-2 text-sm ${view === "dashboard" ? "bg-slate-900 text-white" : "border border-slate-300 bg-white dark:bg-slate-900"}`}
           >
             Dashboard
           </button>
           <button
             type="button"
             onClick={() => setView("kitchen")}
-            className={`rounded-md px-3 py-2 text-sm ${view === "kitchen" ? "bg-slate-900 text-white" : "border border-slate-300 bg-white dark:bg-slate-900"}`}
+            className={`ui-btn rounded-md px-3 py-2 text-sm ${view === "kitchen" ? "bg-slate-900 text-white" : "border border-slate-300 bg-white dark:bg-slate-900"}`}
           >
             Cocina
           </button>
           <button
             type="button"
             onClick={() => setView("delivery")}
-            className={`rounded-md px-3 py-2 text-sm ${view === "delivery" ? "bg-slate-900 text-white" : "border border-slate-300 bg-white dark:bg-slate-900"}`}
+            className={`ui-btn rounded-md px-3 py-2 text-sm ${view === "delivery" ? "bg-slate-900 text-white" : "border border-slate-300 bg-white dark:bg-slate-900"}`}
           >
             Delivery/Pickup
           </button>
           <button
             type="button"
             onClick={() => setDarkMode((v) => !v)}
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm dark:bg-slate-900"
+            className="ui-btn rounded-md border border-slate-300 bg-white px-3 py-2 text-sm dark:bg-slate-900"
           >
             {darkMode ? "Modo claro" : "Modo oscuro"}
           </button>
           <button
             type="button"
             onClick={() => setSoundEnabled((v) => !v)}
-            className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm dark:bg-slate-900"
+            className="ui-btn rounded-md border border-slate-300 bg-white px-3 py-2 text-sm dark:bg-slate-900"
           >
             Sonido {soundEnabled ? "ON" : "OFF"}
           </button>
         </div>
       </header>
 
-      <section className="mb-4 grid gap-2 rounded-lg border border-slate-200 bg-white p-3 md:grid-cols-7 dark:bg-slate-900">
+      <section className="ui-panel mb-4 grid gap-2 rounded-xl p-3 md:grid-cols-7">
         <select className="rounded-md border border-slate-200 p-2 text-sm" value={filters.estado} onChange={(e) => setFilters((s) => ({ ...s, estado: e.target.value }))}>
           <option value="">Estado comanda</option>
           {COMANDA_ESTADOS.map((estado) => (
@@ -468,32 +496,32 @@ export default function AdminComandas() {
       </section>
 
       {authError && !useMock && (
-        <div className="mb-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <div className="mb-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700 shadow-sm">
           Error autenticando con backend V3: {authError}
         </div>
       )}
 
       {tableroError && !useMock && (
-        <div className="mb-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <div className="mb-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700 shadow-sm">
           Error al cargar comandas: {tableroError.message}
         </div>
       )}
 
       {(authLoading || loadingComandas) && !useMock ? (
-        <div className="rounded-md border border-slate-200 bg-white p-8 text-center text-sm text-slate-500">Cargando comandas...</div>
+        <div className="ui-panel rounded-md p-8 text-center text-sm text-slate-500">Cargando comandas...</div>
       ) : null}
 
       {view === "dashboard" && (
         <section className="overflow-x-auto pb-4">
           <div className="grid min-w-[1200px] grid-cols-7 gap-3">
             {COMANDA_ESTADOS.map((estado) => (
-              <div key={estado} className="rounded-lg border border-slate-200 bg-slate-100/50 p-2 dark:bg-slate-900">
+              <div key={estado} className="ui-column rounded-lg p-2">
                 <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-slate-700 dark:text-slate-200">
                   {ESTADO_LABELS[estado]} ({grouped[estado]?.length || 0})
                 </h2>
                 <div className="space-y-2">
-                  {(grouped[estado] || []).map((comanda) => (
-                    <ComandaCard key={comanda.id} comanda={comanda} onOpenDetail={setSelectedComanda} />
+                  {(grouped[estado] || []).map((comanda, index) => (
+                    <ComandaCard key={comanda.id} comanda={comanda} index={index} onOpenDetail={setSelectedComanda} />
                   ))}
                 </div>
               </div>
